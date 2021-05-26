@@ -1,10 +1,10 @@
 # Elk Stack Documentation
 >Elasticsearch Logstash & Kibana (ELK)
 
-###SUMMERY: During our class we deployed a new VM that has an ELK Stack service running on it. This
+### SUMMERY: During our class we deployed a new VM that has an ELK Stack service running on it. This
 ELK Stack service allows us to track and manage logs for our WebVM machines all in one place.
 
-####The cloud isn't anything new either it has been around for a long time, it has just become more viable in the past decade with the ease of use and configuration. Now anyone can easily utilize cloud computing in todays era
+#### The cloud isn't anything new either it has been around for a long time, it has just become more viable in the past decade with the ease of use and configuration. Now anyone can easily utilize cloud computing in todays era
 >Cloud computing is really a no-brainer for any start-up because it allows you to test your business plan very quickly for little money. Every start-up, or even a division within a company that has an idea for something new, should be figuring out how to use cloud computing in its plan. Brad Jefferson, Animoto CEO. 2009.
 
 #### Terminology
@@ -66,44 +66,60 @@ ELK Stack service allows us to track and manage logs for our WebVM machines all 
 
 ## Network Table
 >Here you can view the entire ELK resource info in a table, you can also view it in EXCEL if you wish to do so [HW13 Network Tables](./HW13_Network_Tables.xlsx), this table was generated via: https://tabletomarkdown.com/convert-spreadsheet-to-markdown/
- -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+| Resource Type           | Resource Name        |                                |                    |           |                   |                |        |
+| ----------------------- | -------------------- | ------------------------------ | ------------------ | --------- | ----------------- | -------------- | ------ |
+| Resource Group          | RedTeamCloud         |                                |                    |           |                   |                |        |
+|                         |                      |                                |                    |           |                   |                |        |
+| Virtual Network         | RedTeamVnet          | Subnet                         | 10.0.0.0/16        |           |                   |                |        |
+|                         |                      |                                |                    |           |                   |                |        |
+| Virtual Machines        | Name                 | Public IP Address              | Private IP Address | Region    |                   |                |        |
+|                         | Jump-Box-Provisioner | 52.136.124.77                  | 10.0.0.10          | East US   |                   |                |        |
+|                         | Web-1                | 104.211.55.41 (Load Balancer)  | 10.0.0.13          | East US   |                   |                |        |
+|                         | Web-2                | 104.211.55.41 (Load Balancer)  | 10.0.0.14          | East US   |                   |                |        |
+|                         | Web-3                | 104.211.55.41 (Load Balancer)  | 10.0.0.15          | East US   |                   |                |        |
+|                         |                      |                                |                    |           |                   |                |        |
+| Load Balancer           | Name                 | Public IP Address              |                    |           |                   |                |        |
+|                         | RedTeamLoadBalancer  | 104.211.55.41                  |                    |           |                   |                |        |
+|                         |                      |                                |                    |           |                   |                |        |
+| Network Security Group  | Name                 |                                |                    |           |                   |                |        |
+|                         | RedTeamSecGroup      |                                |                    |           |                   |                |        |
+| Inbound Security Rules  | Priority             | Name                           | Source Port        | Protocall | Source            | Destination    | Action |
+|                         | 3700                 | Webservers                     | 80                 | TCP       | Any               | Any            | Allow  |
+|                         | 3800                 | InternalSSHVPN                 | 22                 | TCP       | 10.0.0.10         | VirtualNetwork | Allow  |
+|                         | 4000                 | JumpVMSSH                      | 22                 | TCP       | 143.59.\*.\*      | Any            | Allow  |
+|                         | 65000                | AllowVnetInBound               | Any                | Any       | VirtualNetwork    | VirtualNetwork | Allow  |
+|                         | 65001                | AllowAzureLoadBalancerInBound  | Any                | Any       | AzureLoadBalancer | Any            | Allow  |
+|                         | 65500                | DenyAllInBound                 | Any                | Any       | Any               | Any            | Deny   |
+|                         |                      |                                |                    |           |                   |                |        |
+| Outbound Security Rules | Priority             | Name                           | Source Port        | Protocall | Source            | Destination    | Action |
+|                         | 65000                | AllowVnetOutBound              | Any                | Any       | VirtualNetwork    | VirtualNetwork | Allow  |
+|                         | 65001                | AllowAzureLoadBalancerOutBound | Any                | Any       | Any               | Internet       | Allow  |
+|                         | 65500                | DenyAllOutBound                | Any                | Any       | Any               | Any            | Deny   |
+
+
 | Resource Type           | Resource Name        |                                |                    |            |                   |                |        |
 | ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
 | Resource Group          | ElkServer\_group     |                                |                    |            |                   |                |        |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-| Virtual Network         | RedTeamVnet          | Subnet                         | 10.1.0.0/16        |            |                   |                |        |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-| Virtual Machines        | Name                 | Public IP Address              | Private IP Address | Region     |                   |                |        |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-|                         | Jump-Box-Provisioner | 40.122.119.65 (StaticIP)       | 10.1.0.4           | Central US |                   |                |        |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-| Load Balancer           | Name                 | Public IP Address              |                    |            |                   |                |        |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-|                         | ElkServerStaticIP    | 40.122.119.65                  |                    |            |                   |                |        |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-| Network Security Group  | Name                 |                                |                    |            |                   |                |        |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-|                         | ElkServer-nsg        |                                |                    |            |                   |                |        |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-| Inbound Security Rules  | Priority             | Name                           | Source Port        | Protocall  | Source            | Destination    | Action |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-|                         | 1000                 | JumpVMSSH                      | 5601               | TCP        | 143.59.\*.\*      | Any            | Allow  |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-|                         | 1100                 | SSHPeering                     | 22                 | TCP        | 10.0.0.10         | VirtualNetwork | Allow  |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-|                         | 65000                | AllowVnetInBound               | Any                | Any        | VirtualNetwork    | VirtualNetwork | Allow  |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-|                         | 65001                | AllowAzureLoadBalancerInBound  | Any                | Any        | AzureLoadBalancer | Any            | Allow  |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
-|                         | 65500                | DenyAllInBound                 | Any                | Any        | Any               | Any            | Deny   |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
 |                         |                      |                                |                    |            |                   |                |        |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
+| Virtual Network         | RedTeamVnet          | Subnet                         | 10.1.0.0/16        |            |                   |                |        |
+|                         |                      |                                |                    |            |                   |                |        |
+| Virtual Machines        | Name                 | Public IP Address              | Private IP Address | Region     |                   |                |        |
+|                         | Jump-Box-Provisioner | 40.122.119.65 (StaticIP)       | 10.1.0.4           | Central US |                   |                |        |
+|                         |                      |                                |                    |            |                   |                |        |
+| Load Balancer           | Name                 | Public IP Address              |                    |            |                   |                |        |
+|                         | ElkServerStaticIP    | 40.122.119.65                  |                    |            |                   |                |        |
+|                         |                      |                                |                    |            |                   |                |        |
+| Network Security Group  | Name                 |                                |                    |            |                   |                |        |
+|                         | ElkServer-nsg        |                                |                    |            |                   |                |        |
+| Inbound Security Rules  | Priority             | Name                           | Source Port        | Protocall  | Source            | Destination    | Action |
+|                         | 1000                 | JumpVMSSH                      | 5601               | TCP        | 143.59.\*.\*      | Any            | Allow  |
+|                         | 1100                 | SSHPeering                     | 22                 | TCP        | 10.0.0.10         | VirtualNetwork | Allow  |
+|                         | 65000                | AllowVnetInBound               | Any                | Any        | VirtualNetwork    | VirtualNetwork | Allow  |
+|                         | 65001                | AllowAzureLoadBalancerInBound  | Any                | Any        | AzureLoadBalancer | Any            | Allow  |
+|                         | 65500                | DenyAllInBound                 | Any                | Any        | Any               | Any            | Deny   |
+|                         |                      |                                |                    |            |                   |                |        |
 | Outbound Security Rules | Priority             | Name                           | Source Port        | Protocall  | Source            | Destination    | Action |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
 |                         | 65000                | AllowVnetOutBound              | Any                | Any        | VirtualNetwork    | VirtualNetwork | Allow  |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
 |                         | 65001                | AllowAzureLoadBalancerOutBound | Any                | Any        | Any               | Internet       | Allow  |
-| ----------------------- | -------------------- | ------------------------------ | ------------------ | ---------- | ----------------- | -------------- | ------ |
 |                         | 65500                | DenyAllOutBound                | Any                | Any        | Any               | Any            | Deny   |
- -----------------------------------------------------------------------------------------------------------------------------------------------------------------
